@@ -1,96 +1,96 @@
 
-rm(list=ls())
-
-require(data.table)
 require(ggplot2)
 
-# read data from CSV file and only keep useful columns
-getData <- function(csv_file) {
-  data <- data.table(read.csv(csv_file, skip=1))
-  col.names <- c('id','member_id','loan_amnt','term','list_d','int_rate','grade','sub_grade','annual_inc','purpose','addr_city','addr_state','dti','earliest_cr_line','fico_range_low','fico_range_high','policy_code','pub_rec','pub_rec_bankruptcies')
-  data.modified <- data[, col.names, with=FALSE]
-  return(data.modified)
-}
+# the date intervals
+dates <- as.Date(c("2007-06-01", "2008-01-01", "2008-06-01", "2009-01-01", "2009-06-01", "2010-01-01", "2010-06-01", "2011-01-01", "2011-06-01", "2012-01-01", "2012-06-01", "2013-01-01", "2013-06-01", "2014-01-01", "2014-06-01"))
 
-cleanUpData <- function(data) {
-  # dealing with int_rate
-  setkey(data, int_rate)
-  data[, interest_rate:=as.numeric(substr(as.character(int_rate),1,6)), by='int_rate']
-  data[, int_rate:=NULL]
-  return(data)
-}
+#------------------------------------------------------------------
 
-# pull in data
-data <- getData('/Users/sinahab/Documents/Development/GroupLend/Data/Data_final/LoanStats3a_securev1.csv')
+# regression analysis between 1) interest rate, and 2) FICO score.
+fit.fico <- lm(data$interest_rate ~ data$fico)
+summary(fit.fico)
 
-# Wrangling data
-# cleaning up interest rates
-setkey(data, int_rate)
-data[, interest_rate:=as.numeric(substr(as.character(int_rate),1,6)), by='int_rate']
-data[, int_rate:=NULL]
-data <- data[!is.na(interest_rate)]
+ggplot(data=data) +
+  geom_point(aes(x=fico, y=interest_rate), alpha=0.05) +
+  xlab('FICO score') + ylab('interest rate') +
+  ggtitle('Plot of 1) interest rate vs. 2) FICO score\n')
 
-# cleaning up id
-setkey(data, id)
-data[, primary_id:=as.character(id), by='id']
-data[, id:=NULL]
+ggplot(data=data) +
+  geom_point(aes(x=fico, y=interest_rate), alpha=0.05) +
+  facet_wrap(~ date_lower_bound, ncol=2) +
+  xlab('FICO score') + ylab('interest rate') +
+  ggtitle('Plot of 1) interest rate vs. 2) FICO score\nas broken down by loan list date\n')
 
-# finding midpoint of fico range
-setkey(data, fico_range_low, fico_range_high)
-data[, fico:=mean(c(fico_range_low,fico_range_high)), by="fico_range_low,fico_range_high"]
-data[, fico_range_low:=NULL]
-data[, fico_range_high:=NULL]
+#------------------------------------------------------------------
 
-# fixing the credit history length
-setkey(data, earliest_cr_line)
-data[, earliest_credit_line:=as.Date( substr(as.character(earliest_cr_line),1,10),"%Y-%m-%d")]
-data <- data[,earliest_cr_line:=NULL]
-data <- data[!is.na(earliest_credit_line)]
-# todays date
-today <- Sys.Date()
-setkey(data, earliest_credit_line)
-data[, credit_history_length_in_days:=today-earliest_credit_line, by=earliest_credit_line]
-data[, earliest_credit_line:=NULL]
+# regression analysis between 1) interest rate, and 2) debt-to-income ratio.
+fit.dti <- lm(data$interest_rate ~ data$dti)
+summary(fit.dti)
 
-# fixing the loan list data
-setkey(data, list_d)
-data[, list_date:=as.Date(as.character(list_d),"%Y-%m-%d")]
-data[, list_d:=NULL]
-
-# excluding loans where term is 60 months
-data <- data[term==" 36 months"]
+ggplot(data=data) +
+  geom_point(aes(x=dti, y=interest_rate), alpha=0.05) +
+  xlab('Debt-to-income ratio') + ylab('interest rate') +
+  ggtitle('Plot of 1) interest rate vs. 2) dti ratio\n')
+  
+ggplot(data=data) +
+  geom_point(aes(x=dti, y=interest_rate), alpha=0.05) +
+  facet_wrap(~ date_lower_bound, ncol=2) +
+  xlab('Debt-to-income ratio') + ylab('interest rate') +
+  ggtitle('Plot of 1) interest rate vs. 2) dti ratio\nas broken down by loan list date\n')
 
 
+#------------------------------------------------------------------
 
-# TODO
+# regression analysis between 1) interest rate, and 2) length of credit history.
+fit.credit_history_length <- lm(data$interest_rate ~ data$credit_history_length_in_days)
+summary(fit.credit_history_length)
+
+ggplot(data=data) +
+  geom_point(aes(x=credit_history_length_in_days, y=interest_rate), alpha=0.05) +
+  xlab('Lenght of Credit History in Days') + ylab('interest rate') +
+  ggtitle('Plot of 1) interest rate vs. 2) credit history length\n')
+
+ggplot(data=data) +
+  geom_point(aes(x=credit_history_length_in_days, y=interest_rate), alpha=0.05) +
+  facet_wrap(~ date_lower_bound, ncol=2) +
+  xlab('Lenght of Credit History in Days') + ylab('interest rate') +
+  ggtitle('Plot of 1) interest rate vs. 2) credit history length\nas broken down by loan list date\n')
+#------------------------------------------------------------------
+
 # histogram of loan grades
-# histogram of loan subgrades
+ggplot(data=data) +
+  geom_histogram(aes(x=grade)) +
+  ggtitle('Histogram of loan grades\n')
+
+# histogram of loan sub_grades
+ggplot(data=data) +
+  geom_histogram(aes(x=sub_grade)) +
+  ggtitle('Histogram of loan sub-grades\n')
+
+# plot of 1) interest rate vs. 2) subgrade
+ggplot(data=data) +
+  geom_point(aes(x=sub_grade, y=interest_rate), alpha=0.05) +
+  xlab("loan sub-grade") + ylab("interest rate") +
+  ggtitle("Plot of 1) interest rate vs. 2) loan sub_grade\n")
+
+# plot of 1) interest rate vs. 2) annual income
+ggplot(data=data) +
+  geom_point(aes(x=annual_inc, y=interest_rate), alpha=0.05) +
+  xlab("annual income") + ylab("interest rate") +
+  ggtitle("Plot of 1) interest rate vs. 2) annual income\n")
+
+#------------------------------------------------------------------
+
+# Plotting
+fit <- lm(data$interest_rate ~ data$dti + data$fico + data$loan_amnt + data$credit_history_length_in_days)
+fitted(fit)
+
+layout(matrix(1:4,2,2))
+plot(fit)
+
+ggplot(cbind(data$interest_rate, fitted(fit))) + geom_point(aes(x=interest_rate, y=fit))
 
 
-# # plotting the interest rate vs. the grade
-# ggplot(data=data.modified[!is.na(grade) & !is.na(interest_rate)]) +
-#   geom_point(aes(x=grade, y=interest_rate), alpha=0.1) +
-#   xlab('grade') + ylab('interest rate') +
-#   ggtitle('interest rate vs. grade\n')
-# 
-# # plotting annual income vs. grade
-# ggplot(data=data.modified[!is.na(annual_inc) & !is.na(grade) & annual_inc<2*10^6]) +
-#   geom_point(aes(x=grade, y=annual_inc), alpha=0.1) +
-#   xlab('grade') + ylab('annual income') +
-#   ggtitle('annual income vs. grade\n')
-# 
-# # histogram of loan purposes
-# ggplot(data=data.modified) +
-#   geom_histogram(aes(x=purpose)) + 
-#   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-#   ggtitle('histogram of loans broken down by purpose\n')
-# 
-# # histogram of address states
-# ggplot(data=data.modified) +
-#   geom_histogram(aes(x=addr_state)) + 
-#   theme(axis.text.x = element_text(angle = 90, hjust = 1)) +
-#   ylab('state') +
-#   ggtitle('histogram of loans broken down by state\n')
-# 
-# 
-# 
+
+
+

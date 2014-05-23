@@ -1,0 +1,51 @@
+
+------------------------------------------------------------------------
+
+- Dependent variables:
+interest rate
+sub grade
+
+- Independent vars:
+FICO
+debt to income
+Funded amount (asked for)
+
+- Probably included in FICO:
+Length of credit history
+Delinquency (default or lateness)
+# of inquiries in the past
+num_sats
+
+Exclude 60 month loans
+Ignore "policy_code" 2 loans (only include policy code 1)
+
+------------------------------------------------------------------------
+
+First Approach:
+1) do regression analysis to find how the various columns are correlated with each other (similar to the scatter plot map they had done in the blog post), 2) analyze how the interest rate correlates with these variables through a multi-regression. 3) use the findings to model the interest rate as a function of these variables.
+
+Second Approach:
+to use machine learning, specifically decision trees and random forests. In this approach, we’d feed the data into the already-existing algorithms, and allow them to find patterns however they can. I’ve done this before at Pulse Energy, and know that it can be successful especially with large data sets (which we do have). Given that there are likely multiple variables involved in determining the interest rate, this method would be superior compared to running multi-regressions because we don’t have to decide which variables are important in advance and assume linear relationships.
+
+------------------------------------------------------------------------
+
+some useful analysis: 
+http://nbviewer.ipython.org/github/nborwankar/LearnDataScience/blob/master/notebooks/A2.%20Linear%20Regression%20-%20Data%20Exploration%20-%20Lending%20Club.ipynb
+
+In statistical significance testing, the p-value is the probability of obtaining a test statistic result at least as extreme as the one that was actually observed, assuming that the null hypothesis is true.[1][2] A researcher will often "reject the null hypothesis" when the p-value turns out to be less than a predetermined significance level, often 0.05[3][4] or 0.01. Such a result indicates that the observed result would be highly unlikely under the null hypothesis.
+
+http://www.montefiore.ulg.ac.be/~kvansteen/GBIO0009-1/ac20092010/Class8/Using%20R%20for%20linear%20regression.pdf
+
+------------------------------------------------------------------------
+
+There were no policy 2 codes.
+
+One thing to be careful of, however, is that they periodically change their credit policies so it might make sense to look at the data broken down into 6 or 12 month chunks instead of a single combined data set.
+
+May 14th: 5 hours
+
+starting at 10:30pm
+
+
+
+
