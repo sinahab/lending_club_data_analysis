@@ -1,5 +1,33 @@
+
+
 LC Data Analysis - Regressions
 ========================================================
+
+This document presents the results of the following analysis:
+
+- regression between interest rate & FICO score
+- regression between interest rate & debt-to-income ratio
+- regression between interest rate & loan amount
+
+Furthermore, the following visualizations are included:
+
+- histogram of loan grades.
+- histogram of loan sub-grades.
+- plot of interest rate vs. loan sub-grade
+- plot of interest rate vs. annual income
+
+Note that:
+
+- the FICO value used is the average of "fico_range_low" and "fico_range_high".
+- loans where annual income was declared to be greater than $500,000 were not included in the analysis. These data points were considered to be outliers.
+- the sections of analysis described "as broken down by loan list date" were arrived at by looking at the loans in 6 month intervals starting from 2007-06-01 and ending at 2014-06-01.
+
+
+
+
+------
+
+
 
 This is an R Markdown document. Markdown is a simple formatting syntax for authoring web pages (click the **Help** toolbar button for more details on using R Markdown).
 

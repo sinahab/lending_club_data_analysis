@@ -41,20 +41,21 @@ ggplot(data=data) +
 
 #------------------------------------------------------------------
 
-# regression analysis between 1) interest rate, and 2) length of credit history.
-fit.credit_history_length <- lm(data$interest_rate ~ data$credit_history_length_in_days)
-summary(fit.credit_history_length)
+# regression analysis between 1) interest rate, and 2) loan amount.
+fit.loan_amnt <- lm(data$interest_rate ~ data$loan_amnt)
+summary(fit.loan_amnt)
 
 ggplot(data=data) +
-  geom_point(aes(x=credit_history_length_in_days, y=interest_rate), alpha=0.05) +
-  xlab('Lenght of Credit History in Days') + ylab('interest rate') +
-  ggtitle('Plot of 1) interest rate vs. 2) credit history length\n')
+  geom_point(aes(x=loan_amnt, y=interest_rate), alpha=0.05) +
+  xlab('loan amount ($)') + ylab('interest rate') +
+  ggtitle('Plot of 1) interest rate vs. 2) loan amount\n')
 
 ggplot(data=data) +
-  geom_point(aes(x=credit_history_length_in_days, y=interest_rate), alpha=0.05) +
+  geom_point(aes(x=loan_amnt, y=interest_rate), alpha=0.05) +
   facet_wrap(~ date_lower_bound, ncol=2) +
-  xlab('Lenght of Credit History in Days') + ylab('interest rate') +
-  ggtitle('Plot of 1) interest rate vs. 2) credit history length\nas broken down by loan list date\n')
+  xlab('loan amount ($)') + ylab('interest rate') +
+  ggtitle('Plot of 1) interest rate vs. 2) loan amount\nas broken down by loan list date\n')
+
 #------------------------------------------------------------------
 
 # histogram of loan grades
