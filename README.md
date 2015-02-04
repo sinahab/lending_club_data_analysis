@@ -1,4 +1,2 @@
-Consulting
-==========
 
-Data science consulting
+Analyzing Lending Club's historical loan data.
